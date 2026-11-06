@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <img src="icon.png" alt="ToDoアイコン" width="40" height="40">
+        <h1>NOTEBOOK ToDo</h1>
+    </header>
+    <main>
+        <section class="input">
+            <input type="text" id="textinput" class="textinput" placeholder="新しい付箋を貼る">
+            <select id="colorselect" class="colorselect">
+                <option value="#fef08a" style="background-color: #fef08a;">イエロー🟨</option>
+                <option value="#bae6fd" style="background-color: #bae6fd;">ブルー🟦</option>
+                <option value="#a7f3d0" style="background-color: #a7f3d0;">グリーン🟩</option>
+                <option value="#fbcfe8" style="background-color: #fbcfe8;">ピンク🟥</option>
+            </select>
+            <button id="addtask" class="addtask">＋追加</button>
+        </section>
+        <section class="todolist" id="todolist">
+           
+        </section>
+    </main>
+    <script src="script.js" type="module"></script>
+</body>
+
+</html>
