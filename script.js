@@ -22,7 +22,11 @@ const colorSelect = document.getElementById("colorselect");
 const AddTask = document.getElementById("addtask");
 const TodoList = document.getElementById("todolist");
 
+//追加処理の二重実行ガード（スマホでの二度タップ対策）
+let isAdding = false;
+
 AddTask.addEventListener("click", async () => {
+    if (isAdding) return;
     const TEXTINPUT = TextInput.value;
     const COLORSELECT = colorSelect.value;
     if (TEXTINPUT === "") {
@@ -30,6 +34,8 @@ AddTask.addEventListener("click", async () => {
         return;
     }
 
+    isAdding = true;
+    AddTask.disabled = true;
     try {
         await addDoc(collection(db, "todos"), {
             task: TEXTINPUT,
@@ -41,14 +47,23 @@ AddTask.addEventListener("click", async () => {
     } catch (error) {
         console.error("Error adding document: ", error);
         alert("保存に失敗しました");
+    } finally {
+        isAdding = false;
+        AddTask.disabled = false;
     }
 });
 
 //todoを取得する処理
+//連番ガード：古い取得結果は描画しない（同時実行による二重表示対策）
+let fetchSeq = 0;
+
 const fetchTodos = async () => {
+    const seq = ++fetchSeq;
     try {
-        TodoList.innerHTML = "";
         const querySnapshot = await getDocs(collection(db, "todos"));
+        if (seq !== fetchSeq) return; // より新しい取得が始まっていたら破棄
+        //取得が終わってから一括で描画する
+        const fragment = document.createDocumentFragment();
         querySnapshot.forEach((item) => {
             const data = item.data();
             const id = item.id;
@@ -59,11 +74,14 @@ const fetchTodos = async () => {
             deleteBtn.textContent = "×";
             deleteBtn.addEventListener("click", (e) => {
                 e.stopPropagation(); // 親要素へのクリック伝播を防ぐ
+                deleteBtn.disabled = true; // 二度タップでの二重削除を防ぐ
                 deleteTodo(id);
             });
             div.appendChild(deleteBtn);
-            TodoList.appendChild(div);
+            fragment.appendChild(div);
         });
+        TodoList.innerHTML = "";
+        TodoList.appendChild(fragment);
     } catch (error) {
         console.error("Error fetching documents: ", error);
         alert("データの取得に失敗しました");
